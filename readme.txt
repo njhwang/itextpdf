@@ -1,3 +1,6 @@
+4/26/15: Hacked PdfContentStreamProcessor.processContent() to avoid PdfLiteral
+casting errors. Building as 5.5.5mod.
+
 To build iText, maven must be installed. ( http://maven.apache.org/ )
 Running install without a profile will generate the itextpdf jar. (mvn install)
 When using the profile 'all' also the source and javadoc jars will be generated.( mvn install -P all )
