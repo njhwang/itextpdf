@@ -345,13 +345,22 @@ public class PdfContentStreamProcessor {
             PdfContentParser ps = new PdfContentParser(tokeniser);
             ArrayList<PdfObject> operands = new ArrayList<PdfObject>();
             while (ps.parse(operands).size() > 0){
-                PdfLiteral operator = (PdfLiteral)operands.get(operands.size()-1);
-                if ("BI".equals(operator.toString())){
-                    // we don't call invokeOperator for embedded images - this is one area of the PDF spec that is particularly nasty and inconsistent
-                    PdfDictionary colorSpaceDic = resources != null ? resources.getAsDict(PdfName.COLORSPACE) : null;
-                    handleInlineImage(InlineImageUtils.parseInlineImage(ps, colorSpaceDic), colorSpaceDic);
-                } else {
-                    invokeOperator(operator, operands);
+                PdfObject obj = operands.get(operands.size()-1);
+                PdfLiteral operator = null;
+                try {
+                    operator = (PdfLiteral) obj;
+                    if ("BI".equals(operator.toString())){
+                        // we don't call invokeOperator for embedded images - this is one area of the PDF spec that is particularly nasty and inconsistent
+                        PdfDictionary colorSpaceDic = resources != null ? resources.getAsDict(PdfName.COLORSPACE) : null;
+                        handleInlineImage(InlineImageUtils.parseInlineImage(ps, colorSpaceDic), colorSpaceDic);
+                    } else {
+                        invokeOperator(operator, operands);
+                    }
+                } catch (ClassCastException cce) {
+                    System.out.println("ERROR: Couldn't convert " + obj 
+                                     + " of type " + obj.type()
+                                     + " to PdfLiteral. Object has " 
+                                     + obj.length() + " bytes.");
                 }
             }
 
